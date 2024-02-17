@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fruit Nutrtional Facts</title>
+</head>
+<body>
+
+<div id="fruitInfo"></div>
+
+<script>
+const url = 'https://www.fruityvice.com/api/fruit/banana';
+
+async function getFruit(url) {
+  const response = await fetch(url);
+  if (response.ok) {
+    const data = await response.json();
+    doStuff(data);
+  }
+}
+
+function doStuff(data) {
+  const fruitInfoElement = document.getElementById('fruitInfo');
+  fruitInfoElement.innerHTML = `<p>Name: ${data.name}</p>
+                                  <p>Calories: ${data.calories}</p>
+                                  <p>Fat: ${data.fat}</p>
+                                  <p>Sugar: ${data.sugar}</p>
+                                  <p>Carbs: ${data.carbohydrates}</p>
+                                  <p>Protein: ${data.protein}</p>`;
+}
+
+getFruit(url);
+</script>
+
+</body>
+</html>
