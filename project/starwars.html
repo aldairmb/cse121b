@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Wars Characters Info</title>
+<link rel="stylesheet" href="../w03-task/styles/main.css">
+
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&family=Playfair+Display:wght@700&family=Protest+Guerrilla&display=swap');
+body, html {
+  height: 100%;
+  margin: 0;
+  background-color: black;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+#searchbar {
+  text-align: center;
+  width: 300px;
+  font-family: 'Kode Mono', monospace;
+}
+
+#all_messages {
+  color: yellow;
+  padding: 10px; 
+  text-align: center;
+  font-family: 'Kode Mono', monospace;
+}
+
+#searchMessage {
+  margin-top: 15px;
+}
+
+#message, #characterInfo {
+  margin-top: 20px;
+}
+
+h1 {
+  color: yellow;
+  font-family: 'Kode Mono', monospace;
+}
+
+#searchbar {
+  font-family: 'Kode Mono', monospace;
+}
+
+#characterNameInput {
+  font-family: 'Kode Mono', monospace;
+}
+
+
+</style>
+</head>
+
+
+
+
+<body>
+
+  <nav>
+    <ul id="menu">
+      <li><a id="toggleMenu">&equiv;</a></li>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../w01-task/w01-task.html">W1 Task</a></li>
+      <li><a href="../w03-task/w03-task.html">W3 Task</a></li>
+      <li><a href="../w04-task/w04-task.html">W4 Task</a></li>
+      <li><a href="../w05-task/w05-task.html">W5 Task</a></li>
+      <li><a href="../project/starwars.html"class="active">Project</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h1>Get data about anyone in the galaxy</h1>
+
+    <div id="searchbar">
+      <input type="text" id="characterNameInput" placeholder="Enter name">
+      <button style="font-family: 'Kode Mono', monospace;" onclick="searchCharacter()">Search</button>
+    </div>
+
+    <div id="all_messages">
+
+      <div id="searchMessage" style="display: none;">
+        <img id="troopies" src="https://media.giphy.com/media/bVuDlIxG65K8w/giphy.gif" alt="Troopies GIF">
+        <p>Please wait while we access the Republic's database...</p>
+      </div>
+
+      <div id="message"></div>
+
+      <div id="characterInfo"></div>
+    </div>
+  </div>
+
+
+
+
+
+<script>
+async function getCharacterInfo(id) {
+  const url = `https://swapi.dev/api/people/${id}/`;
+  const response = await fetch(url);
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else if (response.status === 404) {
+    throw new Error('Character not found');
+  } else {
+    throw new Error('Failed to fetch character information');
+  }
+}
+
+
+async function searchCharacter() {
+
+  clearCharacterInfo();
+
+  const characterName = document.getElementById('characterNameInput').value;
+  clearMessage();
+
+  const searchMessage = document.getElementById('searchMessage');
+  searchMessage.style.display = 'block';
+  
+  try {
+    const character = await findCharacter(characterName);
+    displayCharacterInfo(character);
+  } catch (error) {
+    console.error(error);
+    if (error.message === 'Character not found') {
+      displayMessage("Our databases cannot be accessed from Tatooine. Plase try again in a different planet.");
+    } else {
+      displayMessage("You don't have the clearence to access this type of information.");
+    }
+  } finally {
+    searchMessage.style.display = 'none';
+  }
+}
+
+
+async function findCharacter(name) {
+  for (let id = 1; id <= 83; id++) {
+    try {
+      const character = await getCharacterInfo(id);
+      if (character.name.toLowerCase().includes(name.toLowerCase())) {
+        return character;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  throw new Error('Character not found');
+}
+
+
+function displayCharacterInfo(character) {
+  const characterInfoElement = document.getElementById('characterInfo');
+  characterInfoElement.innerHTML = `<p>Name: ${character.name}</p>
+                                      <p>Height: ${character.height} cm</p>
+                                      <p>Mass: ${character.mass} kg</p>
+                                      <p>Gender: ${character.gender}</p>
+                                      <p>Hair Color: ${character.hair_color}</p>
+                                      <p>Skin Color: ${character.skin_color}</p>
+                                      <p>Eye Color: ${character.eye_color}</p>
+                                      <p>Birth Year: ${character.birth_year}</p>`;
+}
+
+function displayMessage(message) {
+  const messageElement = document.getElementById('message');
+  messageElement.innerHTML = `<p>${message}</p>`;
+}
+
+
+function clearMessage() {
+  const messageElement = document.getElementById('message');
+  messageElement.innerHTML = '';
+}
+
+function clearCharacterInfo() {
+  const characterInfoElement = document.getElementById('characterInfo');
+  characterInfoElement.innerHTML = '';
+}
+
+
+</script>
+
+</body>
+</html>
